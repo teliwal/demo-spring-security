@@ -2,6 +2,7 @@ package com.example.demo.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -11,10 +12,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
-import static com.example.demo.security.ApplicationUserRole.EMPLOYEE;
+import static com.example.demo.security.ApplicationUserRole.*;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class ApplicationSecurityConfig  extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
@@ -25,7 +27,9 @@ public class ApplicationSecurityConfig  extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+        http
+            .csrf().disable()
+            .authorizeRequests()
             .antMatchers("/","index","/css/*","/js/*").permitAll()
             .antMatchers("/api/**").hasRole(EMPLOYEE.name())
             .anyRequest()
@@ -40,19 +44,20 @@ public class ApplicationSecurityConfig  extends WebSecurityConfigurerAdapter {
         UserDetails telly = User.builder()
                 .username("telly")
                 .password(passwordEncoder.encode("kikala"))
-                .roles(EMPLOYEE.name())
+                //.roles(EMPLOYEE.name())
+                .authorities(EMPLOYEE.getGrantedAuthorities())
                 .build();
 
         UserDetails responsable = User.builder()
                 .username("resp")
                 .password(passwordEncoder.encode("password"))
-                .roles(EMPLOYEE.name())
+                .authorities(RESPONSIBLE.getGrantedAuthorities())
                 .build();
 
         UserDetails admin = User.builder()
                 .username("admin")
                 .password(passwordEncoder.encode("password123"))
-                .roles(EMPLOYEE.name())
+                .authorities(ADMIN.getGrantedAuthorities())
                 .build();
 
         return new InMemoryUserDetailsManager(telly,responsable,admin);

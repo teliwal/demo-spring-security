@@ -21,11 +21,11 @@ public class EmployeeController {
         return  employees;
     }
 
-    @GetMapping(value = "/{id}")
-    public Employee getEmployeeById(@PathVariable("id") int id){
+    @GetMapping(value = "/{idEmployee}")
+    public Employee getEmployeeById(@PathVariable("idEmployee") int idEmployee){
         return employees
-                .stream().filter(e -> e.getId() == id).findFirst()
-                .orElseThrow( () -> new IllegalArgumentException("No Employee found with this id: " + id));
+                .stream().filter(e -> e.getId() == idEmployee).findFirst()
+                .orElseThrow( () -> new IllegalArgumentException("No Employee found with this id: " + idEmployee));
     }
 
 }
